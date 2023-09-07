@@ -56,8 +56,10 @@ async def get_work_details_by_work_id(work_id: int):
 
 @app.post("/users/applyButt/{user_id}/{work_id}")
 async def apply_button(user_id: int, work_id: int):
-    # addUserToListOfCandidate()
-    # addWorkToListOfWork()
+    addUserToListOfCandidate(work_id, user_id)
+    addWorkToListOfWork(work_id, user_id)
+    initUserStatus(work_id, user_id)
     # notiUserAppToRecruiter()
-    # updateUserStatusInWork()
+    
     pass
+

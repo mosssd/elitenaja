@@ -12,6 +12,7 @@ client = pymongo.MongoClient(connection_string)
 
 WorksCollection = client["NineTest"]["Works"]
 RecruitersCollection = client["NineTest"]["Recruiters"]
+UserStatusInWorkCollection = client["NineTest"]["UserStatusInWork"]
 
 
 def job_cost_calculator(number_requirement, hourly_income, start_time, end_time):
@@ -64,3 +65,39 @@ def getWorkByWorkDate(work_date):
 def getWorkByWorkID(work_id):
     item = WorksCollection.find_one({"work_id": work_id})
     return return_items(item, "work")
+
+
+def addUserToListOfCandidate(work_id, user_id):
+    WorksCollection.update_one({"work_id": work_id}, {"$addToSet": {"list_of_candidate": user_id}})
+    
+
+
+def updateUserStatus(user_status_id, user_status, interview_appointment, work_appointment):
+    all_updates = {
+        "$set": {"user_status": user_status,
+                 "interview_appointment": interview_appointment,
+                 "work_appointment": work_appointment}
+    }
+    UserStatusInWorkCollection.update_one({"user_status_id": user_status_id}, all_updates)
+    
+
+
+def initUserStatus(work_id, user_id):
+    user_status_id = gen_id()
+    
+    user_status = {
+        "user_status_id": user_status_id,
+        "user_status": "waiting",
+        "interview_appointment": None,
+        "work_appointment": None
+    }
+    
+    UserStatusInWorkCollection.insert_one(user_status)
+    temp = str(user_id)
+    
+    target_dict = {"$set": {f"user_status.{temp}": user_status_id}}
+    WorksCollection.update_one({"work_id": work_id}, target_dict)
+   
+
+
+updateUserStatus(5, "bigbrain", "bigbrain", "bigbrain")
