@@ -4,9 +4,17 @@ from model import *
 from recruiterManagement import *
 from userManagement import *
 from workManagement import *
+from helpingFunction import *
 
 app = FastAPI()
 
+
+
+@app.get("/gen12datenext")
+async def gen12datenext():
+    return genNext12Days()
+    
+    
 
 
 @app.get("/test/{test_id}/collections/{kuy_id}")
@@ -30,6 +38,7 @@ async def insert_pseudo_user(user: Users):
 
 @app.post("/works/create_work/{recruiter_id}")
 async def insert_pseudo_work(work: Works, recruiter_id: int):
+    # notiFieldOfInteresterd()
     return insertPseudoWork(vars(work), recruiter_id)
     
 

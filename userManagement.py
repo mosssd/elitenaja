@@ -1,7 +1,7 @@
 import pymongo
 from bson.objectid import ObjectId
 import pprint
-from id_generator import *
+from helpingFunction import *
 
 
 
@@ -15,4 +15,4 @@ def insertPseudoUser(user):
     user_id = gen_id()
     user["user_id"] = user_id
     UsersCollection.insert_one(user)
-    pass
+    

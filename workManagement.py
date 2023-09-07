@@ -2,6 +2,7 @@ import pymongo
 from bson.objectid import ObjectId
 import pprint
 from id_generator import *
+from helpingFunction import *
 
 printer = pprint.PrettyPrinter()
 
@@ -50,12 +51,12 @@ def insertPseudoWork(work, recruiter_id):
     work["recruiter_id"] = recruiter_id
     WorksCollection.insert_one(work)
     RecruitersCollection.update_one({"recruiter_id": recruiter_id}, {"$addToSet": {"list_of_work": work_id}})
-    # NotiToUser()
+    # notiUserFieldOfInterested()
     return "you have created work"
 
 
 def getWorkByWorkDate(work_date):
-    work_list = WorksCollection.find({"work_day": work_date})
+    work_list = WorksCollection.find({"work_date": work_date})
     return return_list_items(work_list, "work_list")
 
 
