@@ -1,0 +1,78 @@
+
+Table Users{
+  user_id id [primary key]
+  first_name string
+  last_name string
+  nick_name string
+  gender string
+  age integer
+  birth_date date
+  tel string
+  email string
+  line_id string
+  point float
+  address string
+  credit integer
+  list_of_resume list_of_string
+  list_of_work list_of_work_id
+  field_of_interest list_of_string
+  feedback dictionary [Note: "recruiter_id : [list_of_string]"]
+  
+
+}
+
+
+Table Recruiters{
+  recruiter_id id [primary key]
+  name string
+  address string
+  credit integer
+  have_worked_with dictionary [Note: "type : [list_of_user_id]"]
+}
+
+
+Table Works{
+  work_id id [primary key]
+  name string
+  type_of_work string
+  number_requirement integer
+  work_description string
+  hourly_income integer
+  pot integer
+  appointment dictionary [Note: "user_id : time"]
+  
+
+}
+
+
+Ref: Users.list_of_work < Works.work_id
+
+Ref: Users.feedback < Recruiters.recruiter_id
+
+Ref: Recruiters.have_worked_with < Users.user_id
+
+Ref: Works.appointment < Users.user_id
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
