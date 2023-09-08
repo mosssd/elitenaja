@@ -13,6 +13,8 @@ client = pymongo.MongoClient(connection_string)
 WorksCollection = client["NineTest"]["Works"]
 RecruitersCollection = client["NineTest"]["Recruiters"]
 UserStatusInWorkCollection = client["NineTest"]["UserStatusInWork"]
+UsersCollection = client["NineTest"]["Users"]
+UsersNotiCollection = client["NineTest"]["UsersNotification"]
 
 
 def job_cost_calculator(number_requirement, hourly_income, start_time, end_time):
@@ -52,7 +54,7 @@ def insertPseudoWork(work, recruiter_id):
     work["recruiter_id"] = recruiter_id
     WorksCollection.insert_one(work)
     RecruitersCollection.update_one({"recruiter_id": recruiter_id}, {"$addToSet": {"list_of_work": work_id}})
-    # notiUserFieldOfInterested()
+    notiFieldOfInterestToUser(work)
     return "you have created work"
 
 
@@ -97,7 +99,44 @@ def initUserStatus(work_id, user_id):
     
     target_dict = {"$set": {f"user_status.{temp}": user_status_id}}
     WorksCollection.update_one({"work_id": work_id}, target_dict)
+
+def creat_noti(job,date):
+   text = job + '(งานแนะนำ) : วันที่ '+date
+   return text
    
+def notiFieldOfInterestToUser(work):
+   users = UsersCollection.find()
+   for user in users:
+        try:
+            if user['field_of_interested'][work['type_of_work']]:
+                text = creat_noti(work['name'],work['work_date'])
+                recruiter = RecruitersCollection.find_one({"recruiter_id": work['recruiter_id']})
+                rc_name = recruiter['name']         
+                user_noti_id = gen_id()
+                UsersNotiCollection.insert_one({'user_noti_id': user_noti_id,'date': str(datetime.now()), 'recruiter_name': rc_name ,'text': text })
+                recruiter_noti_id = gen_id()
+                UsersCollection.update_one({"user_id": user["user_id"]},{'$addToSet': {'notification':recruiter_noti_id}})
+        except KeyError:
+            print(f"{work['type_of_work']} is unknown.")
+            #except for user who don't have FieldOfInterest
+   return 0
+
+def delete_work_and_listwork(work_id):
+   recruiter_id =  WorksCollection.find_one({"work_id":work_id})['recruiter_id']
+   WorksCollection.delete_one({"work_id":work_id})
+   listwork = RecruitersCollection.find_one({"recruiter_id":recruiter_id})['list_of_work']
+   listwork.remove(work_id)
+   RecruitersCollection.update_one({"recruiter_id":recruiter_id},{'$set':{'list_of_work': listwork}})
+   return 0
+
+def get_work_from_list_by_date(recruiter_id,date):
+   listwork = RecruitersCollection.find_one({"recruiter_id": recruiter_id})['list_of_work']
+   listbydate = []
+   for workid in listwork:
+        work = WorksCollection.find_one({"work_id": workid})
+        if work['work_date'] == date:
+            listbydate.append(workid)
+   return listbydate
 
 
 updateUserStatus(5, "bigbrain", "bigbrain", "bigbrain")

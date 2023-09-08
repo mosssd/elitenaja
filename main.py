@@ -38,7 +38,6 @@ async def insert_pseudo_user(user: Users):
 
 @app.post("/works/create_work/{recruiter_id}")
 async def insert_pseudo_work(work: Works, recruiter_id: int):
-    # notiFieldOfInteresterd()
     return insertPseudoWork(vars(work), recruiter_id)
     
 
@@ -59,7 +58,14 @@ async def apply_button(user_id: int, work_id: int):
     addUserToListOfCandidate(work_id, user_id)
     addWorkToListOfWork(work_id, user_id)
     initUserStatus(work_id, user_id)
-    # notiUserAppToRecruiter()
-    
+    # notiUserAppToRecruiter()    
     pass
 
+@app.delete("/works/deleteworks/{work_id}")
+async def delete_work(work_id: int):
+   delete_work_and_listwork(work_id)
+   return "success you have delete work"
+
+@app.get("/works/{recruiter_id}/{work_date}")
+async def get_work_by_date(recruiter_id: int,work_date: str):
+   return get_work_from_list_by_date(recruiter_id,work_date)
