@@ -69,3 +69,8 @@ async def delete_work(work_id: int):
 @app.get("/works/{recruiter_id}/{work_date}")
 async def get_work_by_date(recruiter_id: int,work_date: str):
    return get_work_from_list_by_date(recruiter_id,work_date)
+
+@app.patch("/updateworks/{work_id}")
+async def update_work(work_id: int , work: UpdateWorks):
+    update_detail_work(work_id,work.dict(exclude_unset = True))
+    return "success you have update work"

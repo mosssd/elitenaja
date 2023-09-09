@@ -138,5 +138,19 @@ def get_work_from_list_by_date(recruiter_id,date):
             listbydate.append(workid)
    return listbydate
 
+def update_detail_work(work_id,work):
+    work_data = WorksCollection.find_one({"work_id": work_id})
+    recruiter_id = work_data["recruiter_id"]
+    # ถ้าเปลี่ยนพวกเวลา จำนวนคนรับ ราคา ก็ต้องเปลี่ยนpotด้วย
+    RecruitersCollection.update_one({"recruiter_id": recruiter_id}, {"$inc": {"credit": work_data["pot"]}})
+    recruiter_credit = RecruitersCollection.find_one({"recruiter_id": recruiter_id})["credit"]    
+    job_cost = job_cost_calculator(work["number_requirement"], work["hourly_income"], work["start_time"], work["end_time"])
+    if recruiter_credit < job_cost:
+        return "can't edit your credit is too low just go to topup"
+    RecruitersCollection.update_one({"recruiter_id": recruiter_id}, {"$inc": {"credit": -job_cost}})
+    work["pot"] =  job_cost
+    WorksCollection.update_one({'work_id':work_id},{'$set':work})
+    return 0
+
 
 updateUserStatus(5, "bigbrain", "bigbrain", "bigbrain")
